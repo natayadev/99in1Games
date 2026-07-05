@@ -1,0 +1,270 @@
+:root {
+  /* Fondo verde clásico de LCD y píxel verde oscuro casi negro */
+  --lcd-bg: #9bbc0f;
+  --lcd-bg-deep: #8bac0f;
+  --pixel-on: #0f2607;
+  --pixel-ghost: rgba(15, 38, 7, 0.12);
+  --casing: #2e5a1c;
+  --casing-dark: #1d3a11;
+  /* Tamaño de cada píxel del LCD: se adapta al alto y ancho disponibles */
+  --cell: min(
+    24px,
+    calc((100dvh - 330px) / 20),
+    calc((100vw - 190px) / 10)
+  );
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  /* Fondo pixel art: damero de píxeles gigantes en dos verdes */
+  background-color: var(--casing);
+  background-image: conic-gradient(
+    #295117 25%,
+    var(--casing) 0 50%,
+    #295117 0 75%,
+    var(--casing) 0
+  );
+  background-size: 28px 28px;
+  color: var(--pixel-on);
+  font-family: "Courier New", ui-monospace, monospace;
+  height: 100dvh;
+  overflow: hidden;
+  image-rendering: pixelated;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+/* ---------- Consola ---------- */
+
+.console {
+  max-width: 460px;
+  margin: 0 auto;
+  padding: 12px 16px 16px;
+  background: var(--casing-dark);
+  /* Bordes duros: nada de curvas */
+  border: 4px solid #0c1a07;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* En pantallas grandes la consola flota sobre el fondo pixel art */
+@media (min-width: 520px) and (min-height: 640px) {
+  .console {
+    height: auto;
+    margin: 16px auto;
+    box-shadow:
+      0 0 0 4px #3a6f24,
+      0 0 0 8px #0c1a07,
+      12px 12px 0 0 rgba(0, 0, 0, 0.45);
+  }
+}
+
+.console h1 {
+  text-align: center;
+  color: var(--lcd-bg);
+  font-size: 22px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+  text-shadow: 3px 3px 0 #0c1a07, 6px 6px 0 #295117;
+}
+
+.console .subtitle {
+  text-align: center;
+  color: #6f9a3a;
+  font-size: 11px;
+  letter-spacing: 2px;
+  margin-bottom: 14px;
+}
+
+/* ---------- Pantalla LCD ---------- */
+
+.lcd {
+  position: relative;
+  background: var(--lcd-bg);
+  border: 6px solid #0c1a07;
+  padding: 10px;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  box-shadow: inset 4px 4px 0 var(--lcd-bg-deep);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 1px;
+  border: 2px solid var(--pixel-on);
+  padding: 2px;
+  width: 240px;
+}
+
+.cell {
+  aspect-ratio: 1;
+  border: 2px solid var(--pixel-ghost);
+  padding: 2px;
+}
+
+.cell::after {
+  content: "";
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--pixel-ghost);
+}
+
+.cell.on {
+  border-color: var(--pixel-on);
+}
+
+.cell.on::after {
+  background: var(--pixel-on);
+}
+
+/* Panel lateral (score, nivel) */
+
+.panel {
+  width: 96px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.panel .value {
+  font-size: 16px;
+}
+
+.panel .flash {
+  animation: blink 0.8s steps(1) infinite;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0.15;
+  }
+}
+
+/* ---------- Menú ---------- */
+
+/* Se superpone a la cuadrícula para que la pantalla mida
+   exactamente lo mismo que durante el juego */
+.menu-overlay {
+  position: absolute;
+  top: 50%;
+  left: 16px;
+  width: 240px;
+  transform: translateY(-50%);
+}
+
+.menu {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.menu button {
+  width: 100%;
+  text-align: left;
+  background: var(--lcd-bg);
+  border: 2px solid var(--pixel-on);
+  color: var(--pixel-on);
+  padding: 8px 10px;
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  box-shadow: 3px 3px 0 var(--pixel-on);
+}
+
+.menu button:hover,
+.menu button.selected {
+  background: var(--pixel-on);
+  color: var(--lcd-bg);
+}
+
+/* ---------- Controles ---------- */
+
+.controls {
+  margin-top: 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.dpad {
+  display: grid;
+  grid-template-columns: repeat(3, 44px);
+  grid-template-rows: repeat(3, 44px);
+}
+
+.dpad button,
+.btn-action,
+.btn-small {
+  background: #4a7c2c;
+  border: 3px solid #0c1a07;
+  color: #cde48a;
+  font-size: 14px;
+  font-weight: bold;
+  box-shadow: 4px 4px 0 #0c1a07;
+}
+
+.dpad button:active,
+.btn-action:active,
+.btn-small:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 #0c1a07;
+}
+
+.dpad .up { grid-area: 1 / 2; }
+.dpad .left { grid-area: 2 / 1; }
+.dpad .right { grid-area: 2 / 3; }
+.dpad .down { grid-area: 3 / 2; }
+.dpad .mid {
+  grid-area: 2 / 2;
+  background: #4a7c2c;
+  border: 3px solid #0c1a07;
+  box-shadow: none;
+}
+
+.btn-action {
+  width: 64px;
+  height: 64px;
+  font-size: 16px;
+}
+
+.side-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.btn-small {
+  padding: 6px 10px;
+  font-size: 10px;
+  letter-spacing: 1px;
+}
+
+.hint {
+  margin-top: 12px;
+  text-align: center;
+  color: #6f9a3a;
+  font-size: 10px;
+  letter-spacing: 1px;
+}
