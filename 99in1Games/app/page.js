@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { COLS, ROWS, emptyGrid } from "@/lib/board";
+import { COLS, ROWS, emptyGrid, normKey, PALETTE } from "@/lib/board";
 import Controls from "@/components/Controls";
 import GameTetris from "@/components/GameTetris";
 import GameTank from "@/components/GameTank";
@@ -10,14 +10,20 @@ import GameBreaker from "@/components/GameBreaker";
 
 const GAMES = [
   { id: "tetris", label: "A · Tetris", Comp: GameTetris },
-  { id: "tank", label: "B · Tanques", Comp: GameTank },
-  { id: "racing", label: "C · Carreras", Comp: GameRacing },
-  { id: "snake", label: "D · Viborita", Comp: GameSnake },
-  { id: "breaker", label: "E · Rompeladrillos", Comp: GameBreaker },
+  { id: "tank", label: "B · Battle Tank", Comp: GameTank },
+  { id: "racing", label: "C · Formula 1", Comp: GameRacing },
+  { id: "snake", label: "D · Snake", Comp: GameSnake },
+  { id: "breaker", label: "E · Brick Breaker", Comp: GameBreaker },
 ];
 
 export default function Home() {
   const [game, setGame] = useState(null);
+  const [rainbow, setRainbow] = useState(false);
+
+  // Modo rainbow: cambia toda la paleta vía una clase en <body>
+  useEffect(() => {
+    document.body.classList.toggle("rainbow", rainbow);
+  }, [rainbow]);
 
   useEffect(() => {
     const onKey = (e) => {
@@ -33,49 +39,78 @@ export default function Home() {
 
   return (
     <main className="console">
-      <h1>99 in 1</h1>
-      <p className="subtitle">★ Pocket Brick Game ★</p>
-
       {active ? <active.Comp key={active.id} /> : <MenuScreen onPick={setGame} />}
 
-      <Controls />
-
-      <p className="hint">
-        ←→↓ / ASD mover · ↑ / W girar-disparar · A acción · START pausa · MENÚ salir
-      </p>
+      <Controls onColor={() => setRainbow((r) => !r)} />
     </main>
   );
 }
 
 // Menú con la misma pantalla LCD (mismo tamaño que los juegos)
 function MenuScreen({ onPick }) {
+  const [sel, setSel] = useState(0);
+
+  useEffect(() => {
+    const onKey = (e) => {
+      const k = normKey(e.key);
+      if (k === "ArrowUp") {
+        e.preventDefault();
+        setSel((s) => (s + GAMES.length - 1) % GAMES.length);
+      } else if (k === "ArrowDown") {
+        e.preventDefault();
+        setSel((s) => (s + 1) % GAMES.length);
+      } else if (k === "Enter" || k === " ") {
+        e.preventDefault();
+        onPick(GAMES[sel].id);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [sel, onPick]);
+
   const grid = emptyGrid();
   for (let y = 0; y < ROWS; y++) {
-    grid[y][0] = 1;
-    grid[y][COLS - 1] = 1;
+    grid[y][0] = (y % 10) + 1;
+    grid[y][COLS - 1] = ((y + 5) % 10) + 1;
   }
   for (let x = 0; x < COLS; x++) {
-    grid[0][x] = 1;
-    grid[ROWS - 1][x] = 1;
+    grid[0][x] = (x % 10) + 1;
+    grid[ROWS - 1][x] = ((x + 5) % 10) + 1;
   }
   return (
     <div className="lcd">
       <div className="grid">
         {grid.flatMap((row, y) =>
           row.map((v, x) => (
-            <div key={y * COLS + x} className={v ? "cell on" : "cell"} />
+            <div
+              key={y * COLS + x}
+              className={v ? "cell on" : "cell"}
+              style={v ? { "--on": PALETTE[(v - 1) % PALETTE.length] } : undefined}
+            />
           ))
         )}
       </div>
       <div className="panel">
         <div>99 in 1<div className="value">★</div></div>
-        <div className="flash">Elige juego 1-5</div>
+        <div className="flash">Pick game 1-5</div>
+        <div className="howto">
+          <div>How to play</div>
+          <p>←→↓ / ADS move</p>
+          <p>↑ / W rotate·shoot</p>
+          <p>SPACE / A action</p>
+          <p>ENTER pause</p>
+          <p>ESC exit</p>
+        </div>
       </div>
       <div className="menu-overlay">
         <ul className="menu">
           {GAMES.map((x, i) => (
             <li key={x.id}>
-              <button onClick={() => onPick(x.id)}>
+              <button
+                className={i === sel ? "selected" : ""}
+                onMouseEnter={() => setSel(i)}
+                onClick={() => onPick(x.id)}
+              >
                 {i + 1}. {x.label}
               </button>
             </li>

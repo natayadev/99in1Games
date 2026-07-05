@@ -1,15 +1,18 @@
 :root {
-  /* Fondo verde clásico de LCD y píxel verde oscuro casi negro */
-  --lcd-bg: #9bbc0f;
-  --lcd-bg-deep: #8bac0f;
-  --pixel-on: #0f2607;
-  --pixel-ghost: rgba(15, 38, 7, 0.12);
-  --casing: #2e5a1c;
-  --casing-dark: #1d3a11;
+  /* Fondo verde de LCD y píxel verde oscuro casi negro */
+  --lcd-bg: #589e55;
+  --lcd-bg-deep: #4c8a49;
+  --pixel-on: #142e0d;
+  --pixel-ghost: rgba(20, 46, 13, 0.14);
+  /* Web: teal retro · Carcasa de la consola: mostaza retro */
+  --casing: #23707a;
+  --casing-check: #1d616a;
+  --shell: #d9a441;
+  --shell-dark: #4a2f14;
   /* Tamaño de cada píxel del LCD: se adapta al alto y ancho disponibles */
   --cell: min(
     24px,
-    calc((100dvh - 330px) / 20),
+    calc((100dvh - 270px) / 20),
     calc((100vw - 190px) / 10)
   );
 }
@@ -24,9 +27,9 @@ body {
   /* Fondo pixel art: damero de píxeles gigantes en dos verdes */
   background-color: var(--casing);
   background-image: conic-gradient(
-    #295117 25%,
+    var(--casing-check) 25%,
     var(--casing) 0 50%,
-    #295117 0 75%,
+    var(--casing-check) 0 75%,
     var(--casing) 0
   );
   background-size: 28px 28px;
@@ -48,9 +51,10 @@ button {
   max-width: 460px;
   margin: 0 auto;
   padding: 12px 16px 16px;
-  background: var(--casing-dark);
-  /* Bordes duros: nada de curvas */
-  border: 4px solid #0c1a07;
+  background: var(--shell);
+  /* Borde exterior ligeramente redondeado */
+  border: 4px solid var(--shell-dark);
+  border-radius: 12px;
   height: 100dvh;
   display: flex;
   flex-direction: column;
@@ -64,28 +68,10 @@ button {
     height: auto;
     margin: 16px auto;
     box-shadow:
-      0 0 0 4px #3a6f24,
-      0 0 0 8px #0c1a07,
+      0 0 0 4px #f0c268,
+      0 0 0 8px var(--shell-dark),
       12px 12px 0 0 rgba(0, 0, 0, 0.45);
   }
-}
-
-.console h1 {
-  text-align: center;
-  color: var(--lcd-bg);
-  font-size: 22px;
-  letter-spacing: 4px;
-  text-transform: uppercase;
-  margin-bottom: 4px;
-  text-shadow: 3px 3px 0 #0c1a07, 6px 6px 0 #295117;
-}
-
-.console .subtitle {
-  text-align: center;
-  color: #6f9a3a;
-  font-size: 11px;
-  letter-spacing: 2px;
-  margin-bottom: 14px;
 }
 
 /* ---------- Pantalla LCD ---------- */
@@ -93,7 +79,7 @@ button {
 .lcd {
   position: relative;
   background: var(--lcd-bg);
-  border: 6px solid #0c1a07;
+  border: 6px solid #33210f;
   padding: 10px;
   display: flex;
   gap: 10px;
@@ -103,15 +89,15 @@ button {
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(10, 1fr);
-  gap: 1px;
+  grid-template-columns: repeat(10, var(--cell));
+  grid-auto-rows: var(--cell);
   border: 2px solid var(--pixel-on);
   padding: 2px;
-  width: 240px;
 }
 
 .cell {
-  aspect-ratio: 1;
+  width: var(--cell);
+  height: var(--cell);
   border: 2px solid var(--pixel-ghost);
   padding: 2px;
 }
@@ -167,7 +153,7 @@ button {
   position: absolute;
   top: 50%;
   left: 16px;
-  width: 240px;
+  width: calc(10 * var(--cell) + 8px);
   transform: translateY(-50%);
 }
 
@@ -201,35 +187,36 @@ button {
 /* ---------- Controles ---------- */
 
 .controls {
-  margin-top: 18px;
+  margin-top: 6px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 12px;
+  --pad: clamp(34px, 8vmin, 44px);
 }
 
 .dpad {
   display: grid;
-  grid-template-columns: repeat(3, 44px);
-  grid-template-rows: repeat(3, 44px);
+  grid-template-columns: repeat(3, var(--pad));
+  grid-template-rows: repeat(3, var(--pad));
 }
 
 .dpad button,
 .btn-action,
 .btn-small {
-  background: #4a7c2c;
-  border: 3px solid #0c1a07;
-  color: #cde48a;
+  background: #b6452c;
+  border: 3px solid #3a1c10;
+  color: #ffe3c2;
   font-size: 14px;
   font-weight: bold;
-  box-shadow: 4px 4px 0 #0c1a07;
+  box-shadow: 4px 4px 0 #3a1c10;
 }
 
 .dpad button:active,
 .btn-action:active,
 .btn-small:active {
   transform: translate(2px, 2px);
-  box-shadow: 2px 2px 0 #0c1a07;
+  box-shadow: 2px 2px 0 #3a1c10;
 }
 
 .dpad .up { grid-area: 1 / 2; }
@@ -238,14 +225,14 @@ button {
 .dpad .down { grid-area: 3 / 2; }
 .dpad .mid {
   grid-area: 2 / 2;
-  background: #4a7c2c;
-  border: 3px solid #0c1a07;
+  background: #b6452c;
+  border: 3px solid #3a1c10;
   box-shadow: none;
 }
 
 .btn-action {
-  width: 64px;
-  height: 64px;
+  width: clamp(48px, 12vmin, 64px);
+  height: clamp(48px, 12vmin, 64px);
   font-size: 16px;
 }
 
@@ -261,10 +248,118 @@ button {
   letter-spacing: 1px;
 }
 
-.hint {
-  margin-top: 12px;
-  text-align: center;
-  color: #6f9a3a;
-  font-size: 10px;
-  letter-spacing: 1px;
+/* "How to play" en el panel, debajo de "Pick game" */
+.howto {
+  margin-top: 4px;
+  font-size: 8px;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.howto div {
+  margin-bottom: 3px;
+  text-decoration: underline;
+}
+
+.howto p {
+  margin: 2px 0;
+}
+
+/* ---------- Modo Rainbow (paleta Spectral) ---------- */
+
+body.rainbow {
+  background-color: #9e0142;
+  background-image: conic-gradient(
+    #d53e4f 25%,
+    #9e0142 0 50%,
+    #d53e4f 0 75%,
+    #9e0142 0
+  );
+}
+
+body.rainbow .console {
+  background: #5e4fa2;
+  border-color: #1a1030;
+}
+
+@media (min-width: 520px) and (min-height: 640px) {
+  body.rainbow .console {
+    box-shadow:
+      0 0 0 4px #d53e4f,
+      0 0 0 8px #1a1030,
+      12px 12px 0 0 rgba(0, 0, 0, 0.45);
+  }
+}
+
+body.rainbow .lcd {
+  /* Pantalla hueso para que los colores resalten */
+  background: #fdf9ec;
+  border-color: #1a1030;
+  box-shadow: inset 4px 4px 0 rgba(0, 0, 0, 0.08);
+}
+
+body.rainbow .grid {
+  border-color: #1a1030;
+}
+
+body.rainbow .cell {
+  border-color: rgba(94, 79, 162, 0.12);
+}
+
+body.rainbow .cell::after {
+  background: rgba(94, 79, 162, 0.12);
+}
+
+body.rainbow .cell.on {
+  border-color: rgba(12, 6, 32, 0.5);
+}
+
+/* Franjas diagonales con los 10 colores (ciclo de 11 sobre filas de 10) */
+body.rainbow .cell.on:nth-child(11n + 1)::after { background: #9e0142; }
+body.rainbow .cell.on:nth-child(11n + 2)::after { background: #d53e4f; }
+body.rainbow .cell.on:nth-child(11n + 3)::after { background: #f46d43; }
+body.rainbow .cell.on:nth-child(11n + 4)::after { background: #fdae61; }
+body.rainbow .cell.on:nth-child(11n + 5)::after { background: #fee08b; }
+body.rainbow .cell.on:nth-child(11n + 6)::after { background: #e6f598; }
+body.rainbow .cell.on:nth-child(11n + 7)::after { background: #abdda4; }
+body.rainbow .cell.on:nth-child(11n + 8)::after { background: #66c2a5; }
+body.rainbow .cell.on:nth-child(11n + 9)::after { background: #3288bd; }
+body.rainbow .cell.on:nth-child(11n + 10)::after { background: #5e4fa2; }
+body.rainbow .cell.on:nth-child(11n)::after { background: #66c2a5; }
+
+body.rainbow .panel {
+  color: #9e0142;
+}
+
+body.rainbow .menu button {
+  background: #fee08b;
+  border-color: #9e0142;
+  color: #9e0142;
+  box-shadow: 3px 3px 0 #9e0142;
+}
+
+body.rainbow .menu button:hover,
+body.rainbow .menu button.selected {
+  background: #9e0142;
+  color: #fee08b;
+}
+
+body.rainbow .dpad button,
+body.rainbow .btn-action,
+body.rainbow .btn-small {
+  background: #d53e4f;
+  border-color: #1a1030;
+  color: #fee08b;
+  box-shadow: 4px 4px 0 #1a1030;
+}
+
+body.rainbow .dpad button:active,
+body.rainbow .btn-action:active,
+body.rainbow .btn-small:active {
+  box-shadow: 2px 2px 0 #1a1030;
+}
+
+body.rainbow .dpad .mid {
+  box-shadow: none;
 }

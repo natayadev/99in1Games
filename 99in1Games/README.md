@@ -1,27 +1,27 @@
 # 99 in 1 — Pocket Brick Game
 
-Emulador web retro de la clásica consola "Brick Game 9999 in 1", hecho con Next.js. Incluye los 5 juegos base reales del mito:
+Retro web emulator of the classic "Brick Game 9999 in 1" console, built with Next.js (no CSS frameworks). Includes the 5 real base games behind the myth:
 
-A. **Tetris** · B. **Tanques** · C. **Carreras** · D. **Viborita** · E. **Rompeladrillos**
+A. **Tetris** · B. **Battle Tank** · C. **Formula 1** · D. **Snake** · E. **Brick Breaker**
 
-## Cómo ejecutarlo
+## Getting started
 
 ```bash
 npm install
 npm run dev
 ```
 
-Abre http://localhost:3000
+Open http://localhost:3000
 
-## Controles
+## Controls
 
-| Tecla | Acción |
+| Key | Action |
 |---|---|
-| ← → ↓ o A D S | Mover |
-| ↑ o W | Girar (Tetris) / Disparar (Tanques) / Lanzar (Rompeladrillos) |
-| Espacio / botón A | Acción principal |
-| Enter / START | Pausa · Reiniciar tras Game Over |
-| Esc / MENÚ | Volver al menú |
-| 1–5 | Elegir juego desde el menú |
+| ← → ↓ or A D S | Move |
+| ↑ or W | Rotate (Tetris) / Shoot (Battle Tank) / Launch (Brick Breaker) |
+| Space / A button | Main action |
+| Enter / START | Pause · Restart after Game Over |
+| Esc / MENU | Back to menu |
+| 1–5 | Pick a game from the menu |
 
-También hay botones en pantalla (D-pad + botón A) para jugar con mouse o táctil.
+On-screen buttons (D-pad + A) are also available for mouse and touch. The layout scales to fit the viewport with no scrolling, filling the screen on mobile.
