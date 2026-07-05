@@ -41,8 +41,8 @@ export default function GameSnake() {
   const render = () => {
     const s = g.current;
     const view = emptyGrid();
-    s.snake.forEach((c) => (view[c.y][c.x] = 1));
-    view[s.food.y][s.food.x] = 1;
+    s.snake.forEach((c) => (view[c.y][c.x] = 8)); // verde azulado fijo
+    view[s.food.y][s.food.x] = 2; // comida roja fija
     setGrid(view);
     setHud({ score: s.score, level: s.level, over: s.over, paused: s.paused });
   };
@@ -123,10 +123,10 @@ export default function GameSnake() {
       grid={grid}
       panel={
         <>
-          <div>Puntos<div className="value">{hud.score}</div></div>
-          <div>Nivel<div className="value">{hud.level}</div></div>
+          <div>Score<div className="value">{hud.score}</div></div>
+          <div>Level<div className="value">{hud.level}</div></div>
           {hud.over && <div className="flash">GAME OVER · ENTER</div>}
-          {hud.paused && !hud.over && <div className="flash">PAUSA</div>}
+          {hud.paused && !hud.over && <div className="flash">PAUSED</div>}
         </>
       }
     />

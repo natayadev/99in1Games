@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import Screen from "./Screen";
-import { COLS, ROWS, emptyGrid, stamp, normKey } from "@/lib/board";
+import { COLS, ROWS, emptyGrid, stamp, normKey, randColor } from "@/lib/board";
 
 const SHAPES = [
   [[1, 1, 1, 1]],
@@ -40,7 +40,12 @@ const newState = () => ({
 
 function spawn() {
   const shape = SHAPES[Math.floor(Math.random() * SHAPES.length)];
-  return { shape, x: Math.floor((COLS - shape[0].length) / 2), y: -shape.length };
+  return {
+    shape,
+    x: Math.floor((COLS - shape[0].length) / 2),
+    y: -shape.length,
+    color: randColor(),
+  };
 }
 
 export default function GameTetris() {
@@ -51,7 +56,7 @@ export default function GameTetris() {
   const render = () => {
     const s = g.current;
     const view = s.board.map((r) => [...r]);
-    stamp(view, s.shape, s.x, s.y);
+    stamp(view, s.shape, s.x, s.y, s.color);
     setGrid(view);
     setHud({ score: s.score, lines: s.lines, level: s.level, over: s.over, paused: s.paused });
   };
@@ -62,7 +67,7 @@ export default function GameTetris() {
       s.over = true;
       return;
     }
-    stamp(s.board, s.shape, s.x, s.y);
+    stamp(s.board, s.shape, s.x, s.y, s.color);
     const kept = s.board.filter((row) => row.some((v) => !v));
     const cleared = ROWS - kept.length;
     if (cleared) {
@@ -138,11 +143,11 @@ export default function GameTetris() {
       grid={grid}
       panel={
         <>
-          <div>Puntos<div className="value">{hud.score}</div></div>
-          <div>Líneas<div className="value">{hud.lines}</div></div>
-          <div>Nivel<div className="value">{hud.level}</div></div>
+          <div>Score<div className="value">{hud.score}</div></div>
+          <div>Lines<div className="value">{hud.lines}</div></div>
+          <div>Level<div className="value">{hud.level}</div></div>
           {hud.over && <div className="flash">GAME OVER · ENTER</div>}
-          {hud.paused && !hud.over && <div className="flash">PAUSA</div>}
+          {hud.paused && !hud.over && <div className="flash">PAUSED</div>}
         </>
       }
     />

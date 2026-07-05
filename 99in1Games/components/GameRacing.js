@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import Screen from "./Screen";
-import { ROWS, emptyGrid, stamp, normKey } from "@/lib/board";
+import { ROWS, emptyGrid, stamp, normKey, randColor } from "@/lib/board";
 
 const CAR = [
   [0, 1, 0],
@@ -41,10 +41,10 @@ export default function GameRacing() {
   const render = () => {
     const s = g.current;
     const view = emptyGrid();
-    // Borde de la carretera animado
-    for (let y = 0; y < ROWS; y++) if ((y + s.off) % 4 !== 0) view[y][0] = 1;
-    s.enemies.forEach((e) => stamp(view, CAR, LANES[e.lane], e.y));
-    stamp(view, CAR, LANES[s.lane], PLAYER_Y);
+    // Borde de la carretera animado (amarillo fijo)
+    for (let y = 0; y < ROWS; y++) if ((y + s.off) % 4 !== 0) view[y][0] = 5;
+    s.enemies.forEach((e) => stamp(view, CAR, LANES[e.lane], e.y, e.c));
+    stamp(view, CAR, LANES[s.lane], PLAYER_Y, 9); // jugador azul fijo
     setGrid(view);
     setHud({ score: s.score, level: s.level, over: s.over, paused: s.paused });
   };
@@ -60,7 +60,7 @@ export default function GameRacing() {
     s.level = 1 + Math.floor(s.score / 100);
     // Aparece un rival nuevo
     if (s.enemies.every((e) => e.y >= 3) && Math.random() < 0.5) {
-      s.enemies.push({ lane: Math.floor(Math.random() * 3), y: -4 });
+      s.enemies.push({ lane: Math.floor(Math.random() * 3), y: -4, c: randColor() });
     }
     if (s.enemies.some((e) => hits(e, s.lane))) s.over = true;
   };
@@ -111,10 +111,10 @@ export default function GameRacing() {
       grid={grid}
       panel={
         <>
-          <div>Puntos<div className="value">{hud.score}</div></div>
-          <div>Nivel<div className="value">{hud.level}</div></div>
+          <div>Score<div className="value">{hud.score}</div></div>
+          <div>Level<div className="value">{hud.level}</div></div>
           {hud.over && <div className="flash">GAME OVER · ENTER</div>}
-          {hud.paused && !hud.over && <div className="flash">PAUSA</div>}
+          {hud.paused && !hud.over && <div className="flash">PAUSED</div>}
         </>
       }
     />

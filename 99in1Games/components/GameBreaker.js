@@ -6,8 +6,9 @@ import { COLS, ROWS, emptyGrid, normKey } from "@/lib/board";
 const PADDLE_Y = ROWS - 1;
 const PADDLE_W = 3;
 
+// Cada fila de ladrillos con su color fijo (degradado cálido)
 const newBricks = () =>
-  Array.from({ length: 4 }, () => Array(COLS).fill(1));
+  Array.from({ length: 4 }, (_, y) => Array(COLS).fill(y + 2));
 
 const newState = (level = 1, score = 0, lives = 3) => ({
   bricks: newBricks(),
@@ -31,8 +32,8 @@ export default function GameBreaker() {
     const s = g.current;
     const view = emptyGrid();
     s.bricks.forEach((row, y) => row.forEach((v, x) => (view[y][x] = v)));
-    for (let i = 0; i < PADDLE_W; i++) view[PADDLE_Y][s.paddle + i] = 1;
-    if (s.ball.y >= 0 && s.ball.y < ROWS) view[s.ball.y][s.ball.x] = 1;
+    for (let i = 0; i < PADDLE_W; i++) view[PADDLE_Y][s.paddle + i] = 10; // paleta púrpura fija
+    if (s.ball.y >= 0 && s.ball.y < ROWS) view[s.ball.y][s.ball.x] = 1; // bola granate fija
     setGrid(view);
     setHud({ score: s.score, lives: s.lives, level: s.level, over: s.over, paused: s.paused });
   };
@@ -140,11 +141,11 @@ export default function GameBreaker() {
       grid={grid}
       panel={
         <>
-          <div>Puntos<div className="value">{hud.score}</div></div>
-          <div>Vidas<div className="value">{hud.lives}</div></div>
-          <div>Nivel<div className="value">{hud.level}</div></div>
+          <div>Score<div className="value">{hud.score}</div></div>
+          <div>Lives<div className="value">{hud.lives}</div></div>
+          <div>Level<div className="value">{hud.level}</div></div>
           {hud.over && <div className="flash">GAME OVER · ENTER</div>}
-          {hud.paused && !hud.over && <div className="flash">PAUSA</div>}
+          {hud.paused && !hud.over && <div className="flash">PAUSED</div>}
         </>
       }
     />

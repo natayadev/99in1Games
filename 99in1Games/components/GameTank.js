@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import Screen from "./Screen";
-import { COLS, ROWS, emptyGrid, stamp, normKey } from "@/lib/board";
+import { COLS, ROWS, emptyGrid, stamp, normKey, randColor } from "@/lib/board";
 
 const TANK_UP = [
   [0, 1, 0],
@@ -51,10 +51,10 @@ export default function GameTank() {
   const render = () => {
     const s = g.current;
     const view = emptyGrid();
-    s.enemies.forEach((e) => stamp(view, TANK_DOWN, e.x, e.y));
-    stamp(view, TANK_UP, s.x, PLAYER_Y);
+    s.enemies.forEach((e) => stamp(view, TANK_DOWN, e.x, e.y, e.c));
+    stamp(view, TANK_UP, s.x, PLAYER_Y, 9); // jugador azul fijo
     s.bullets.forEach((b) => {
-      if (b.y >= 0 && b.y < ROWS) view[b.y][b.x] = 1;
+      if (b.y >= 0 && b.y < ROWS) view[b.y][b.x] = 2; // balas rojas fijas
     });
     setGrid(view);
     setHud({ score: s.score, level: s.level, over: s.over, paused: s.paused });
@@ -94,7 +94,7 @@ export default function GameTank() {
     if (s.tick % 25 === 0 && s.enemies.length < 3) {
       const x = Math.floor(Math.random() * (COLS - 2));
       if (!s.enemies.some((e) => Math.abs(e.x - x) < 3 && e.y < 4))
-        s.enemies.push({ x, y: -3 });
+        s.enemies.push({ x, y: -3, c: randColor() });
     }
   };
 
@@ -138,10 +138,10 @@ export default function GameTank() {
       grid={grid}
       panel={
         <>
-          <div>Puntos<div className="value">{hud.score}</div></div>
-          <div>Nivel<div className="value">{hud.level}</div></div>
+          <div>Score<div className="value">{hud.score}</div></div>
+          <div>Level<div className="value">{hud.level}</div></div>
           {hud.over && <div className="flash">GAME OVER · ENTER</div>}
-          {hud.paused && !hud.over && <div className="flash">PAUSA</div>}
+          {hud.paused && !hud.over && <div className="flash">PAUSED</div>}
         </>
       }
     />
