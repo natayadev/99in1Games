@@ -1,9 +1,9 @@
 import "./globals.css";
 
 export const metadata = {
-  title: "99 in 1 — Pocket Brick Game",
+  title: "99 in 1 - Pocket Brick Game",
   description:
-    "Retro Pocket Brick Game emulator: Tetris, Battle Tank, Formula 1, Snake and Brick Breaker.",
+    "Retro Pocket Brick Game web emulator: Tetris, Battle Tank, Formula 1, Snake and Brick Breaker.",
 };
 
 export default function RootLayout({ children }) {
