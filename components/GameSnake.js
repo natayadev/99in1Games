@@ -27,6 +27,7 @@ const newState = () => {
     foods: 0,
     score: 0,
     level: 1,
+    t: 0,
     over: false,
     paused: false,
     acc: 0,
@@ -36,15 +37,17 @@ const newState = () => {
 export default function GameSnake() {
   const g = useRef(newState());
   const [grid, setGrid] = useState(emptyGrid());
-  const [hud, setHud] = useState({ score: 0, level: 1, over: false, paused: false });
+  const [hud, setHud] = useState({ score: 0, speed: 1, over: false, paused: false });
+
+  const speedOf = (s) => s.level + Math.floor(s.t / 30000);
 
   const render = () => {
     const s = g.current;
     const view = emptyGrid();
-    s.snake.forEach((c) => (view[c.y][c.x] = 8)); // verde azulado fijo
-    view[s.food.y][s.food.x] = 2; // comida roja fija
+    s.snake.forEach((c) => (view[c.y][c.x] = 8));
+    view[s.food.y][s.food.x] = 2;
     setGrid(view);
-    setHud({ score: s.score, level: s.level, over: s.over, paused: s.paused });
+    setHud({ score: s.score, speed: speedOf(s), over: s.over, paused: s.paused });
   };
 
   const step = () => {
@@ -54,14 +57,12 @@ export default function GameSnake() {
       if (d.x !== -s.dir.x || d.y !== -s.dir.y) s.dir = d;
     }
     const head = { x: s.snake[0].x + s.dir.x, y: s.snake[0].y + s.dir.y };
-    // Choca con la pared
     if (head.x < 0 || head.x >= COLS || head.y < 0 || head.y >= ROWS) {
       s.over = true;
       return;
     }
     const eats = head.x === s.food.x && head.y === s.food.y;
     const body = eats ? s.snake : s.snake.slice(0, -1);
-    // Choca consigo misma
     if (body.some((c) => c.x === head.x && c.y === head.y)) {
       s.over = true;
       return;
@@ -79,8 +80,9 @@ export default function GameSnake() {
     const id = setInterval(() => {
       const s = g.current;
       if (!s.over && !s.paused) {
+        s.t += 50;
         s.acc += 50;
-        const speed = Math.max(90, 280 - (s.level - 1) * 25);
+        const speed = Math.max(90, 280 - (speedOf(s) - 1) * 25);
         if (s.acc >= speed) {
           s.acc = 0;
           step();
@@ -124,7 +126,7 @@ export default function GameSnake() {
       panel={
         <>
           <div>Score<div className="value">{hud.score}</div></div>
-          <div>Level<div className="value">{hud.level}</div></div>
+          <div>Speed<div className="value">{hud.speed}</div></div>
           {hud.over && <div className="flash">GAME OVER · ENTER</div>}
           {hud.paused && !hud.over && <div className="flash">PAUSED</div>}
         </>

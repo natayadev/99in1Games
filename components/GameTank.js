@@ -38,6 +38,7 @@ const newState = () => ({
   enemies: [],
   score: 0,
   level: 1,
+  t: 0,
   tick: 0,
   over: false,
   paused: false,
@@ -46,18 +47,20 @@ const newState = () => ({
 export default function GameTank() {
   const g = useRef(newState());
   const [grid, setGrid] = useState(emptyGrid());
-  const [hud, setHud] = useState({ score: 0, level: 1, over: false, paused: false });
+  const [hud, setHud] = useState({ score: 0, speed: 1, over: false, paused: false });
+
+  const speedOf = (s) => s.level + Math.floor(s.t / 30000);
 
   const render = () => {
     const s = g.current;
     const view = emptyGrid();
     s.enemies.forEach((e) => stamp(view, TANK_DOWN, e.x, e.y, e.c));
-    stamp(view, TANK_UP, s.x, PLAYER_Y, 9); // jugador azul fijo
+    stamp(view, TANK_UP, s.x, PLAYER_Y, 9);
     s.bullets.forEach((b) => {
-      if (b.y >= 0 && b.y < ROWS) view[b.y][b.x] = 2; // balas rojas fijas
+      if (b.y >= 0 && b.y < ROWS) view[b.y][b.x] = 2;
     });
     setGrid(view);
-    setHud({ score: s.score, level: s.level, over: s.over, paused: s.paused });
+    setHud({ score: s.score, speed: speedOf(s), over: s.over, paused: s.paused });
   };
 
   const resolveHits = () => {
@@ -76,21 +79,19 @@ export default function GameTank() {
 
   const step = () => {
     const s = g.current;
+    s.t += 60;
     s.tick += 1;
-    // Balas: rápidas
     if (s.tick % 2 === 0) {
       s.bullets.forEach((b) => (b.y -= 1));
       resolveHits();
     }
-    // Enemigos: lentos
-    const enemySpeed = Math.max(4, 12 - s.level);
+    const enemySpeed = Math.max(3, 12 - speedOf(s));
     if (s.tick % enemySpeed === 0) {
       s.enemies.forEach((e) => (e.y += 1));
       resolveHits();
       s.enemies = s.enemies.filter((e) => e.y < ROWS);
       if (s.enemies.some((e) => overlapsPlayer(e, s.x))) s.over = true;
     }
-    // Aparecen enemigos nuevos
     if (s.tick % 25 === 0 && s.enemies.length < 3) {
       const x = Math.floor(Math.random() * (COLS - 2));
       if (!s.enemies.some((e) => Math.abs(e.x - x) < 3 && e.y < 4))
@@ -139,7 +140,7 @@ export default function GameTank() {
       panel={
         <>
           <div>Score<div className="value">{hud.score}</div></div>
-          <div>Level<div className="value">{hud.level}</div></div>
+          <div>Speed<div className="value">{hud.speed}</div></div>
           {hud.over && <div className="flash">GAME OVER · ENTER</div>}
           {hud.paused && !hud.over && <div className="flash">PAUSED</div>}
         </>

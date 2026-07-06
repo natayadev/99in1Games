@@ -33,6 +33,7 @@ const newState = () => ({
   score: 0,
   lines: 0,
   level: 1,
+  t: 0,
   over: false,
   paused: false,
   acc: 0,
@@ -51,14 +52,16 @@ function spawn() {
 export default function GameTetris() {
   const g = useRef(newState());
   const [grid, setGrid] = useState(emptyGrid());
-  const [hud, setHud] = useState({ score: 0, lines: 0, level: 1, over: false, paused: false });
+  const [hud, setHud] = useState({ score: 0, lines: 0, speed: 1, over: false, paused: false });
+
+  const speedOf = (s) => s.level + Math.floor(s.t / 30000);
 
   const render = () => {
     const s = g.current;
     const view = s.board.map((r) => [...r]);
     stamp(view, s.shape, s.x, s.y, s.color);
     setGrid(view);
-    setHud({ score: s.score, lines: s.lines, level: s.level, over: s.over, paused: s.paused });
+    setHud({ score: s.score, lines: s.lines, speed: speedOf(s), over: s.over, paused: s.paused });
   };
 
   const lock = () => {
@@ -93,8 +96,9 @@ export default function GameTetris() {
     const id = setInterval(() => {
       const s = g.current;
       if (!s.over && !s.paused) {
+        s.t += 50;
         s.acc += 50;
-        const speed = Math.max(100, 600 - (s.level - 1) * 60);
+        const speed = Math.max(100, 600 - (speedOf(s) - 1) * 60);
         if (s.acc >= speed) {
           s.acc = 0;
           drop();
@@ -145,7 +149,7 @@ export default function GameTetris() {
         <>
           <div>Score<div className="value">{hud.score}</div></div>
           <div>Lines<div className="value">{hud.lines}</div></div>
-          <div>Level<div className="value">{hud.level}</div></div>
+          <div>Speed<div className="value">{hud.speed}</div></div>
           {hud.over && <div className="flash">GAME OVER · ENTER</div>}
           {hud.paused && !hud.over && <div className="flash">PAUSED</div>}
         </>

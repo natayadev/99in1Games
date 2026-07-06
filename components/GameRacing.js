@@ -9,7 +9,7 @@ const CAR = [
   [0, 1, 0],
   [1, 0, 1],
 ];
-const LANES = [1, 4, 7]; // columna izquierda de cada carril
+const LANES = [1, 4, 7];
 const PLAYER_Y = ROWS - 4;
 
 function hits(e, lane) {
@@ -27,6 +27,7 @@ const newState = () => ({
   enemies: [],
   score: 0,
   level: 1,
+  t: 0,
   off: 0,
   over: false,
   paused: false,
@@ -36,29 +37,28 @@ const newState = () => ({
 export default function GameRacing() {
   const g = useRef(newState());
   const [grid, setGrid] = useState(emptyGrid());
-  const [hud, setHud] = useState({ score: 0, level: 1, over: false, paused: false });
+  const [hud, setHud] = useState({ score: 0, speed: 1, over: false, paused: false });
+
+  const speedOf = (s) => s.level + Math.floor(s.t / 30000);
 
   const render = () => {
     const s = g.current;
     const view = emptyGrid();
-    // Borde de la carretera animado (amarillo fijo)
     for (let y = 0; y < ROWS; y++) if ((y + s.off) % 4 !== 0) view[y][0] = 5;
     s.enemies.forEach((e) => stamp(view, CAR, LANES[e.lane], e.y, e.c));
-    stamp(view, CAR, LANES[s.lane], PLAYER_Y, 9); // jugador azul fijo
+    stamp(view, CAR, LANES[s.lane], PLAYER_Y, 9);
     setGrid(view);
-    setHud({ score: s.score, level: s.level, over: s.over, paused: s.paused });
+    setHud({ score: s.score, speed: speedOf(s), over: s.over, paused: s.paused });
   };
 
   const step = () => {
     const s = g.current;
     s.off += 1;
     s.enemies.forEach((e) => (e.y += 1));
-    // Enemigos que pasan: puntos
     const before = s.enemies.length;
     s.enemies = s.enemies.filter((e) => e.y < ROWS);
     s.score += (before - s.enemies.length) * 10;
     s.level = 1 + Math.floor(s.score / 100);
-    // Aparece un rival nuevo
     if (s.enemies.every((e) => e.y >= 3) && Math.random() < 0.5) {
       s.enemies.push({ lane: Math.floor(Math.random() * 3), y: -4, c: randColor() });
     }
@@ -69,8 +69,9 @@ export default function GameRacing() {
     const id = setInterval(() => {
       const s = g.current;
       if (!s.over && !s.paused) {
+        s.t += 50;
         s.acc += 50;
-        const speed = Math.max(80, 300 - (s.level - 1) * 30);
+        const speed = Math.max(80, 300 - (speedOf(s) - 1) * 30);
         if (s.acc >= speed) {
           s.acc = 0;
           step();
@@ -92,7 +93,7 @@ export default function GameRacing() {
       else if (k === "ArrowRight") s.lane = Math.min(2, s.lane + 1);
       else if (k === "ArrowDown" || k === " ") {
         e.preventDefault();
-        step(); // turbo
+        step();
         s.score += 1;
       }
       if (k.startsWith("Arrow")) e.preventDefault();
@@ -112,7 +113,7 @@ export default function GameRacing() {
       panel={
         <>
           <div>Score<div className="value">{hud.score}</div></div>
-          <div>Level<div className="value">{hud.level}</div></div>
+          <div>Speed<div className="value">{hud.speed}</div></div>
           {hud.over && <div className="flash">GAME OVER · ENTER</div>}
           {hud.paused && !hud.over && <div className="flash">PAUSED</div>}
         </>

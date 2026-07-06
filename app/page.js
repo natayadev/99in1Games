@@ -9,18 +9,17 @@ import GameSnake from "@/components/GameSnake";
 import GameBreaker from "@/components/GameBreaker";
 
 const GAMES = [
-  { id: "tetris", label: "A · Tetris", Comp: GameTetris },
-  { id: "tank", label: "B · Battle Tank", Comp: GameTank },
-  { id: "racing", label: "C · Formula 1", Comp: GameRacing },
-  { id: "snake", label: "D · Snake", Comp: GameSnake },
-  { id: "breaker", label: "E · Brick Breaker", Comp: GameBreaker },
+  { id: "tetris", label: "Tetris", Comp: GameTetris },
+  { id: "tank", label: "Battle Tank", Comp: GameTank },
+  { id: "racing", label: "Formula 1", Comp: GameRacing },
+  { id: "snake", label: "Snake", Comp: GameSnake },
+  { id: "breaker", label: "Brick Breaker", Comp: GameBreaker },
 ];
 
 export default function Home() {
   const [game, setGame] = useState(null);
   const [rainbow, setRainbow] = useState(false);
 
-  // Modo rainbow: cambia toda la paleta vía una clase en <body>
   useEffect(() => {
     document.body.classList.toggle("rainbow", rainbow);
   }, [rainbow]);
@@ -46,7 +45,6 @@ export default function Home() {
   );
 }
 
-// Menú con la misma pantalla LCD (mismo tamaño que los juegos)
 function MenuScreen({ onPick }) {
   const [sel, setSel] = useState(0);
 
@@ -91,8 +89,7 @@ function MenuScreen({ onPick }) {
         )}
       </div>
       <div className="panel">
-        <div>99 in 1<div className="value">★</div></div>
-        <div className="flash">Pick game 1-5</div>
+        <div className="flash">Pick game</div>
         <div className="howto">
           <div>How to play</div>
           <p>←→↓ / ADS move</p>

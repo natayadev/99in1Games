@@ -6,7 +6,6 @@ import { COLS, ROWS, emptyGrid, normKey } from "@/lib/board";
 const PADDLE_Y = ROWS - 1;
 const PADDLE_W = 3;
 
-// Cada fila de ladrillos con su color fijo (degradado cálido)
 const newBricks = () =>
   Array.from({ length: 4 }, (_, y) => Array(COLS).fill(y + 2));
 
@@ -18,6 +17,7 @@ const newState = (level = 1, score = 0, lives = 3) => ({
   score,
   lives,
   level,
+  t: 0,
   over: false,
   paused: false,
   acc: 0,
@@ -26,16 +26,18 @@ const newState = (level = 1, score = 0, lives = 3) => ({
 export default function GameBreaker() {
   const g = useRef(newState());
   const [grid, setGrid] = useState(emptyGrid());
-  const [hud, setHud] = useState({ score: 0, lives: 3, level: 1, over: false, paused: false });
+  const [hud, setHud] = useState({ score: 0, lives: 3, speed: 1, over: false, paused: false });
+
+  const speedOf = (s) => s.level + Math.floor(s.t / 30000);
 
   const render = () => {
     const s = g.current;
     const view = emptyGrid();
     s.bricks.forEach((row, y) => row.forEach((v, x) => (view[y][x] = v)));
-    for (let i = 0; i < PADDLE_W; i++) view[PADDLE_Y][s.paddle + i] = 10; // paleta púrpura fija
-    if (s.ball.y >= 0 && s.ball.y < ROWS) view[s.ball.y][s.ball.x] = 1; // bola granate fija
+    for (let i = 0; i < PADDLE_W; i++) view[PADDLE_Y][s.paddle + i] = 10;
+    if (s.ball.y >= 0 && s.ball.y < ROWS) view[s.ball.y][s.ball.x] = 1;
     setGrid(view);
-    setHud({ score: s.score, lives: s.lives, level: s.level, over: s.over, paused: s.paused });
+    setHud({ score: s.score, lives: s.lives, speed: speedOf(s), over: s.over, paused: s.paused });
   };
 
   const step = () => {
@@ -48,7 +50,6 @@ export default function GameBreaker() {
     const b = s.ball;
     let nx = b.x + b.dx;
     let ny = b.y + b.dy;
-    // Rebote en paredes
     if (nx < 0 || nx >= COLS) {
       b.dx = -b.dx;
       nx = b.x + b.dx;
@@ -57,7 +58,6 @@ export default function GameBreaker() {
       b.dy = -b.dy;
       ny = b.y + b.dy;
     }
-    // Ladrillos
     if (ny >= 0 && ny < s.bricks.length && s.bricks[ny][nx]) {
       s.bricks[ny][nx] = 0;
       s.score += 10 * s.level;
@@ -68,7 +68,6 @@ export default function GameBreaker() {
       }
       return;
     }
-    // Paleta
     if (ny === PADDLE_Y) {
       if (nx >= s.paddle && nx < s.paddle + PADDLE_W) {
         b.dy = -1;
@@ -79,7 +78,6 @@ export default function GameBreaker() {
         return;
       }
     }
-    // Se escapa por abajo
     if (ny >= ROWS) {
       s.lives -= 1;
       if (s.lives <= 0) s.over = true;
@@ -94,8 +92,9 @@ export default function GameBreaker() {
     const id = setInterval(() => {
       const s = g.current;
       if (!s.over && !s.paused) {
+        s.t += 50;
         s.acc += 50;
-        const speed = Math.max(70, 170 - (s.level - 1) * 20);
+        const speed = Math.max(70, 170 - (speedOf(s) - 1) * 20);
         if (s.acc >= speed) {
           s.acc = 0;
           step();
@@ -143,7 +142,7 @@ export default function GameBreaker() {
         <>
           <div>Score<div className="value">{hud.score}</div></div>
           <div>Lives<div className="value">{hud.lives}</div></div>
-          <div>Level<div className="value">{hud.level}</div></div>
+          <div>Speed<div className="value">{hud.speed}</div></div>
           {hud.over && <div className="flash">GAME OVER · ENTER</div>}
           {hud.paused && !hud.over && <div className="flash">PAUSED</div>}
         </>
